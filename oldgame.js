@@ -1,8 +1,8 @@
-// Stores the current "key" location of the mole
 let timeLeft = 30;
 let score = 0;
 let isPaused = false;
 
+// Stores the current "key" location of the mole
 let currentBurrowKey;
 
 const gameState = {};
@@ -35,23 +35,23 @@ class GameScene extends Phaser.Scene {
 	preload() {
 		// calls the image function to load in the background, and assigns the image to the field key
 		// the background is loaded from the given url
-		this.load.image('background', 'https://content.codecademy.com/courses/learn-phaser/mole-unearther/background.png');
+		this.load.image('background', 'https://codecademy-content.s3.amazonaws.com/courses/learn-phaser/mole-unearther/background.png');
 		// calls the spritesheet function to load in the mole as a spritesheet to make animations, and assigns it to the mole key
 		// the mole is loaded from the given url with the given width and height
 		this.load.spritesheet('mole',
-			'https://content.codecademy.com/courses/learn-phaser/mole-unearther/mole-sprite.png',
+			'https://codecademy-content.s3.amazonaws.com/courses/learn-phaser/mole-unearther/mole-sprite.png',
 			{ frameWidth: 198, frameHeight: 250 });
 	}
 
 	// set up scene visuals, animations, and game logic when events occur
 	create() {
-    const updateTimer = (timeElapsed) => {
-      timeLeft -= timeElapsed;
+    const updateTimer = () => {
+      timeLeft -= 1;
     }
 		// executed after every second passes
-		const onSecondElapsed = (timeElapsed) => {
+		const onSecondElapsed = () => {
 			if (isPaused === false) {
-        updateTimer(timeElapsed)
+        updateTimer();
 				// display the new time to the user
 				this.updateTimerText();
 			}
@@ -85,12 +85,13 @@ class GameScene extends Phaser.Scene {
 		}
 
     const updateScore = (points) => {
-      score += points;
+      score += points
     }
 		// user successfully hit the mole, so reward the user with 5pts
 		const applyHitReward = () => {
 			// display how many points the user will gain
 			this.displayRewardText();
+      
       updateScore(5);
 			// display the new score to the user
 			this.updateScoreText();
@@ -100,41 +101,42 @@ class GameScene extends Phaser.Scene {
 		const applyMissPenalty = () => {
 			// display how many points the user will lose
 			this.displayPenaltyText();
-      updateScore(-5);
-			// display the new score to the user
+      updateScore(-5)
+			// display the new  score to the user
 			this.updateScoreText();
 		};
 
     const onBurrowHit = (key) => {
       if (key === currentBurrowKey) {
         applyHitReward();
-				this.relocateMole();
-			} else {
-				applyMissPenalty();
-			}
+        this.relocateMole();
+      } else {
+        applyMissPenalty();
       }
+    };
+
+    const togglePause = () => {
+      if (isPaused === false) {
+        this.displayPauseScreen();
+      } else {
+        this.removePauseScreen();
+      }
+    };
+
 		if (isPaused === false) {
 			// check each burrow's location if the user is hitting the corresponding key
 			// and run the handler to determine if user should get a reward or penalty
 			if (Phaser.Input.Keyboard.JustDown(gameState.jKey)) {
-        onBurrowHit('j');
+        onBurrowHit('j')
 			} else if (Phaser.Input.Keyboard.JustDown(gameState.kKey)) {
-        onBurrowHit('k');
+        onBurrowHit('k')
 			} else if (Phaser.Input.Keyboard.JustDown(gameState.lKey)) {
-        onBurrowHit('l');
+        onBurrowHit('l')
 			}
 		}
-  
+
 		if (Phaser.Input.Keyboard.JustDown(gameState.spaceKey)) {
-      const togglePause = () => {
-			if (isPaused === true) {
-				isPaused = false;
-				this.removePauseScreen();
-			} else {
-				isPaused = true;
-				this.displayPauseScreen();
-			}
-		};
+      togglePause();
 		}
 	}
 
