@@ -45,13 +45,16 @@ class GameScene extends Phaser.Scene {
 
 	// set up scene visuals, animations, and game logic when events occur
 	create() {
-    const updateTimer = () => {
-      timeLeft -= 1;
-    }
+		const updateTimer = (timeElapsed) => {
+			timeLeft -= timeElapsed;
+		};
+
 		// executed after every second passes
-		const onSecondElapsed = () => {
+		const onSecondElapsed = (timeElapsed) => {
 			if (isPaused === false) {
-        updateTimer();
+				// USER ACTIVITY: Update timer by amount of time that elapsed
+				updateTimer(timeElapsed);
+
 				// display the new time to the user
 				this.updateTimerText();
 			}
@@ -84,15 +87,16 @@ class GameScene extends Phaser.Scene {
 			this.scene.start('EndScene');
 		}
 
-    const updateScore = (points) => {
-      score += points
-    }
+		const updateScore = (points) => {
+			// update user's score by given amount
+			score += points;
+		};
+
 		// user successfully hit the mole, so reward the user with 5pts
 		const applyHitReward = () => {
 			// display how many points the user will gain
 			this.displayRewardText();
-      
-      updateScore(5);
+			updateScore(5);
 			// display the new score to the user
 			this.updateScoreText();
 		};
@@ -101,42 +105,48 @@ class GameScene extends Phaser.Scene {
 		const applyMissPenalty = () => {
 			// display how many points the user will lose
 			this.displayPenaltyText();
-      updateScore(-5)
-			// display the new  score to the user
+			updateScore(-5);
+			// display the new score to the user
 			this.updateScoreText();
 		};
 
-    const onBurrowHit = (key) => {
-      if (key === currentBurrowKey) {
-        applyHitReward();
-        this.relocateMole();
-      } else {
-        applyMissPenalty();
-      }
-    };
-
-    const togglePause = () => {
-      if (isPaused === false) {
-        this.displayPauseScreen();
-      } else {
-        this.removePauseScreen();
-      }
-    };
+		const onBurrowHit = (key) => {
+			// check if user has successfully hit the mole's current burrow
+			if (key === currentBurrowKey) {
+				applyHitReward();
+				this.relocateMole();
+			} else {
+				applyMissPenalty();
+			}
+		};
 
 		if (isPaused === false) {
 			// check each burrow's location if the user is hitting the corresponding key
 			// and run the handler to determine if user should get a reward or penalty
 			if (Phaser.Input.Keyboard.JustDown(gameState.jKey)) {
-        onBurrowHit('j')
+				// USER ACTIVITY: Call the key handler
+				onBurrowHit('j');
 			} else if (Phaser.Input.Keyboard.JustDown(gameState.kKey)) {
-        onBurrowHit('k')
+				// USER ACTIVITY: Call the key handler
+				onBurrowHit('k');
 			} else if (Phaser.Input.Keyboard.JustDown(gameState.lKey)) {
-        onBurrowHit('l')
+				// USER ACTIVITY: Call the key handler
+				onBurrowHit('l');
 			}
 		}
 
+		const togglePause = () => {
+			if (isPaused === true) {
+				isPaused = false;
+				this.removePauseScreen();
+			} else {
+				isPaused = true;
+				this.displayPauseScreen();
+			}
+		};
+
 		if (Phaser.Input.Keyboard.JustDown(gameState.spaceKey)) {
-      togglePause();
+			togglePause();
 		}
 	}
 
